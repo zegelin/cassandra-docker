@@ -1,7 +1,0 @@
-FROM base-openjre
-
-COPY install-cassandra /tmp/install-cassandra
-
-#RUN /tmp/install-cassandra @@APACHE_CASSANDRA_VERSION@@
-
-RUN /tmp/install-cassandra 3.11.2

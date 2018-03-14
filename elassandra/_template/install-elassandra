@@ -1,0 +1,41 @@
+#!/bin/bash -xue
+
+elassandra_version=$1
+cassandra_version=$2
+
+pkg_dir=$(mktemp -d) && chmod 755 "${pkg_dir}"
+arch="all"
+arch_pkg_dir="${pkg_dir}/${arch}" && mkdir "${arch_pkg_dir}"
+
+# download the C* packages
+(cd "${arch_pkg_dir}" &&
+    curl -SLO "https://github.com/strapdata/elassandra/releases/download/v${elassandra_version}/elassandra-${elassandra_version}.deb" &&
+    curl -SLO "https://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra-tools_${cassandra_version}_all.deb")
+    
+dagi dpkg-dev
+
+# build a local repository
+(cd "${pkg_dir}" && dpkg-scanpackages ${arch} | gzip -9c > "${arch_pkg_dir}/Packages.gz")
+
+# install El*
+echo "deb file:${pkg_dir} ${arch}/" > /etc/apt/sources.list.d/elassandra.sources.list
+APT_GET_OPTS="--allow-unauthenticated" dagi elassandra
+
+chown -R cassandra:root /var/lib/cassandra /var/log/cassandra /usr/share/cassandra
+chmod -R g+rwX /var/lib/cassandra /var/log/cassandra /usr/share/cassandra
+
+# package "cleanup"
+mkdir /usr/share/cassandra/agents
+mv /usr/share/cassandra/lib/jamm-0.3.0.jar /usr/share/cassandra/agents/jamm-0.3.0.jar
+
+# nuke /etc/cassandra and /var/lib/cassandra since they're injected by volume mounts
+rm -rf /etc/cassandra
+#/var/lib/cassandra
+
+
+# clean-up
+rm -rf "${pkg_dir}"
+apt-get -y remove dpkg-dev && apt-get -y autoremove
+rm /etc/apt/sources.list.d/elassandra.sources.list
+
+rm "${BASH_SOURCE}"

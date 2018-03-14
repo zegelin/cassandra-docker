@@ -4,7 +4,7 @@ metadata:
   name: elassandra
 spec:
   serviceName: elassandra
-  replicas: 2
+  replicas: 3
   selector:
       matchLabels:
         app: elassandra
@@ -16,7 +16,7 @@ spec:
       terminationGracePeriodSeconds: 1800
       containers:
       - name: elassandra
-        image: elassandra:latest
+        image: elassandra:5.5.0.13
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 7000
@@ -41,9 +41,7 @@ spec:
         readinessProbe:
           exec:
             command:
-            - cqlsh
-            - -e
-            - 'SELECT * FROM system.local;'
+            - readiness-probe
           initialDelaySeconds: 60
           timeoutSeconds: 5
         volumeMounts:
@@ -54,8 +52,6 @@ spec:
       - name: graphite-exporter
         image: prom/graphite-exporter
         command: ["/bin/graphite_exporter", "--graphite.mapping-config=/etc/config/mapping.conf"]
-#        image: k8s.gcr.io/busybox
-#        command: [ "/bin/sh", "-c", "ls /etc/config/" ]
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 9108
