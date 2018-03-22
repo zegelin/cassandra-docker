@@ -4,6 +4,8 @@ echoerr() { echo "$@" 1>&2; }
 
 . /usr/share/cassandra/cassandra.in.sh
 
+echo "Running as $(id)"
+
 # sanity checks
 for conf in "${CASSANDRA_CONF}/cassandra.yaml" "${CASSANDRA_CONF}/cassandra-env.sh"; do
     if [ ! -f "${conf}" ]; then
@@ -19,4 +21,8 @@ JVM_OPTS=${JVM_OPTS:=}
 export CASSANDRA_CONF
 export CASSANDRA_HOME
 
-exec -a cassandra /usr/bin/java -cp "${CLASSPATH}" ${JVM_OPTS} -Dcassandra-foreground=yes org.apache.cassandra.service.ElassandraDaemon
+exec -a cassandra /usr/bin/java \
+    -cp "${CLASSPATH}" \
+    ${JVM_OPTS} \
+    -Dcassandra-foreground=yes \
+    org.apache.cassandra.service.ElassandraDaemon

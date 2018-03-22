@@ -3,11 +3,14 @@
 elassandra_version=$1
 cassandra_version=$2
 
+adduser --disabled-password --gid 0 --gecos "Cassandra" cassandra
+
+#pkg_dir="/tmp/pkg"
 pkg_dir=$(mktemp -d) && chmod 755 "${pkg_dir}"
 arch="all"
-arch_pkg_dir="${pkg_dir}/${arch}" && mkdir "${arch_pkg_dir}"
+arch_pkg_dir="${pkg_dir}/${arch}" && mkdir -p "${arch_pkg_dir}"
 
-# download the C* packages
+# download the Elasandra packages
 (cd "${arch_pkg_dir}" &&
     curl -SLO "https://github.com/strapdata/elassandra/releases/download/v${elassandra_version}/elassandra-${elassandra_version}.deb" &&
     curl -SLO "https://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra-tools_${cassandra_version}_all.deb")
@@ -29,8 +32,7 @@ mkdir /usr/share/cassandra/agents
 mv /usr/share/cassandra/lib/jamm-0.3.0.jar /usr/share/cassandra/agents/jamm-0.3.0.jar
 
 # nuke /etc/cassandra and /var/lib/cassandra since they're injected by volume mounts
-rm -rf /etc/cassandra
-#/var/lib/cassandra
+rm -rf /etc/cassandra /var/lib/cassandra
 
 
 # clean-up

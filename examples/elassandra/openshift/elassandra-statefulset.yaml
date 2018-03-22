@@ -16,7 +16,7 @@ spec:
       terminationGracePeriodSeconds: 1800
       containers:
       - name: elassandra
-        image: elassandra:5.5.0.13
+        image: instaclustr/elassandra:5.5.0.13
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 7000

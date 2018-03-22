@@ -2,6 +2,8 @@
 
 cassandra_version=$1
 
+adduser --disabled-password --gid 0 --gecos "Cassandra" cassandra
+
 pkg_dir=$(mktemp -d) && chmod 755 "${pkg_dir}"
 arch="all"
 arch_pkg_dir="${pkg_dir}/${arch}" && mkdir "${arch_pkg_dir}"

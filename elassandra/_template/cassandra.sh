@@ -4,6 +4,8 @@ echoerr() { echo "$@" 1>&2; }
 
 . /usr/share/cassandra/cassandra.in.sh
 
+echo "Running as $(id)"
+
 # sanity checks
 for conf in "${CASSANDRA_CONF}/cassandra.yaml" "${CASSANDRA_CONF}/cassandra-env.sh"; do
     if [ ! -f "${conf}" ]; then
